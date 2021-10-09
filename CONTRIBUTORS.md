@@ -2,4 +2,5 @@
 
 1. Harshit Gangwar (harshjoeyit)
 2. Divyanshi Agrawal (Divyanshi070700)
-2. Gursimran Kaur Saini (gursimran18)
+3. Gursimran Kaur Saini (gursimran18)
+4. Raghvendra Mishra (qubits-fan)
