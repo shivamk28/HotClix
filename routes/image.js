@@ -2,7 +2,7 @@ const   router = require('express').Router(),
         dotenv = require('dotenv'),
         verify = require('./verifyToken'),
         AWS = require('aws-sdk'),
-        uuid = require('uuid/v4'),
+        {v4: uuid} = require('uuid'),
         { imageUploadValidation } = require('../validations/imageValidations'),
         url = require('url');
 

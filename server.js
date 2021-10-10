@@ -13,13 +13,14 @@ const authRoutes = require('./routes/auth')
 const imageRoutes = require('./routes/image')
 const galleryRoutes = require('./routes/gallery')
 
+dotenv.config()
 
 // CONNECT TO DB
 const db = mysql.createConnection({
-    host        : 'localhost',
-    user        : 'root',
-    password    : '4004',
-    database    : 'snaphot'
+    host        : process.env.DB_HOST,
+    user        : process.env.DB_USER,
+    password    : process.env.DB_PASSWD,
+    database    : process.env.DB_NAME
 });
 
 db.connect((err) => {

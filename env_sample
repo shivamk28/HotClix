@@ -3,7 +3,10 @@ TOKEN_SECRET =
 AWS_ID = 
 AWS_SECRET = 
 AWS_BUCKET_NAME = 
-
+DB_HOST = 
+DB_USER = 
+DB_PASSWD = 
+DB_NAME = 
 
 ==> Example
 
@@ -12,3 +15,7 @@ TOKEN_SECRET = my_strong_secret_is_this
 AWS_ID = KKINZHMUUYNBWI67LAU6
 AWS_SECRET = jZCzanF6Ephs07c8fYwDlTLP0yFnXgD72jJEqqmh
 AWS_BUCKET_NAME = my_first_bucket
+DB_HOST = localhost
+DB_USER = root
+DB_PASSWD = 4004
+DB_NAME = snaphot
