@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv')
 const verify = require('./verifyToken')
 const { registerValidation, loginValidation } = require('../validations/userValidations');
-
+const mailVerification = require('./mails/send')
 dotenv.config()
 
 // REGISTER USER 
@@ -34,9 +34,38 @@ router.post('/register', async (req,res) => {
         
         let sql = `INSERT INTO users (username, email, password) 
                     VALUES('${username}', '${email}', '${hashedPassword}')`
+
+                 
+
+
+                    
         
         const dbRes = await dbquery(sql)
-        return res.status(201).send({'message': 'user created', id: dbRes.insertId}) 
+
+        const token = jwt.sign ({ id: dbRes.insertId },
+            process.env.TOKEN_SECRET,
+            { expiresIn: 86400 });
+
+             // Promise Return
+        const response=mailVerification.sendMailVerificationMessage(email,username,token);
+     
+   
+
+            response.then(()=>{
+         return res.status(201).send({'message': 'user created', id: dbRes.insertId})      
+            }).catch(e=>{
+                  // Trying Again
+
+                const  response1 = mailVerification.sendMailVerificationMessage(email,username,token)
+                  response1.then(()=>{
+                    return res.status(201).send({'message': 'user created', id: dbRes.insertId})
+                  }).catch(async e=>{
+                    const sql2 =   `DELETE FROM users WHERE id=${dbRes.insertId}`
+                    await dbquery(sql2)
+                 return res.status(400).send({'error': 'Sorry,Could not register'})
+
+                  })     
+             }) 
     }
 
     // CHECK IF USER WITH THIS EMAIL EXISTS 
@@ -52,6 +81,35 @@ router.post('/register', async (req,res) => {
 
     return createNewUser(req.body)
 })
+
+// E Mail Verification
+
+router.get('/verifi', async(req,res)=>{
+    try{
+      const token = req.query.token;
+       if(token == null) {
+             res.send("Error Token is not defined")
+           return;
+       }
+     let isIndeed = jwt.verify(token,process.env.TOKEN_SECRET)
+        let sql = `SELECT * FROM users where id=${isIndeed.id}`
+       const users =  await dbquery(sql)
+
+          if(users.length == 0) {
+                return res.status(500).send("<h1 style='color: red'>Fake Token Sorry Or Token Passed</h1>")
+          }
+      let sql1 = `UPDATE users SET everifi=1 WHERE id=${users[0].id}`
+        await dbquery(sql1)
+    let redirectUrl = 'http://localhost:3000/login'
+    res.send(`<h1>Email verified Successfully</h1><br><a href=${redirectUrl}>Click Here to LogIn</a>`)
+        }
+        catch(e) {
+           console.log(e.toString())
+        }
+})
+
+
+
 
 
 // LOGIN USER 
@@ -83,6 +141,12 @@ router.post('/login', async (req, res) => {
     if(!validPass) {
         return res.status(400).send({'error': 'invalid password'})
     }
+
+    // EMail Verification Notice
+    if(user.everifi == 0) {
+        return res.status(400).send({'error': 'Please Verify Email'})
+   }
+
 
     // CREATE AND ASSIGN NEW TOKEN
    

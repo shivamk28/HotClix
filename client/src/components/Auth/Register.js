@@ -52,6 +52,7 @@ const Register = () => {
                 setError('')
                 // REDIRECT TO SIGNIN
                 setTimeout(() => {
+                    alert('Verification mail has sent to your Registered Mail Please Verify to Log In')
                     history.push('/login');
                 }, 500);
             })
