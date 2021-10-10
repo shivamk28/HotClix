@@ -5,4 +5,5 @@
 3. Mansi Sahu (mansi0703)
 4. Gursimran Kaur Saini (gursimran18)
 5. Raghvendra Mishra (qubits-fan)
-6. Priyanshu Gupta (wsLord)
+6. Himanshu Saini
+7. Priyanshu Gupta (wsLord)
