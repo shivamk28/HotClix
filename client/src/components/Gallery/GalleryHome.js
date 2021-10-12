@@ -4,7 +4,7 @@ import ImageGallery from '../ImageGallery/Gallery'
 import { UserAvatarSmall } from '../UserProfile/Profile'
 import {
     getGalleryDetails, getImages,
-    isUserOwner, deleteGallery
+    isUserOwner, deleteGallery, requestGalleryDownload
 } from '../../helpers/request'
 import { titleCase } from '../../helpers'
 import './galleryHome.css'
@@ -66,6 +66,15 @@ function UserGallery() {
 
     // TODO 
     // enable download 
+        
+    const handleGalleryDownload = (e) => {
+          e.preventDefault()
+         alert("Gallery is being downloaded in .zip format have patient!!")
+          requestGalleryDownload(galleryId,galleryData.gallery.name);     
+   }
+
+
+
 
     return (
         <div className="main-container">
@@ -105,10 +114,11 @@ function UserGallery() {
                                         photo${galleryData.gallery.total_photos > 1 ? 's' : ''}`
                             }
                         </p>
-                        <button>Download</button>
+                        <button onClick={handleGalleryDownload}>Download</button>
                         {
                             galleryData.loading
-                                ? <></>
+                                ? <>
+                                </>
                                 : isUserOwner(galleryData.gallery.created_by)
                                     ? <button onClick={handleDelete}>Delete</button>
                                     : <></>
