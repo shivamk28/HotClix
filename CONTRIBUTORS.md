@@ -9,3 +9,5 @@
 7. Priyanshu Gupta (wsLord)
 8. Ayushi Barua(ayushib01)
 9. Yashika Jain (Yashikaj14)
+10. [Abhijeet Pandey](https://github.com/abhijeetp94)
+
