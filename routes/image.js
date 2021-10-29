@@ -254,7 +254,45 @@ router.delete('/:imageId', verify, async(req, res) => {
 })
 
 
-// UPDATE IMAGE 
+// MOVE IMAGE FROM ONE GALLERY TO ANOTHER
+router.put('/:imageId/to/:newGalleryId', verify, async(req, res) => {
+    const { imageId,newGalleryId } = req.params
+    const userId = req.userId
+
+    let sql = `SELECT * FROM images WHERE id = '${imageId}'`
+    const imageFound = await dbquery(sql)
+
+    // CHECK IF THE IMAGE EXISTS & USER OWNS THIS IMAGE 
+
+    if(imageFound.length === 0) {
+        return res.status(400).send({'error': 'No image found'})
+    }
+    else if(imageFound[0].uploaded_by !== userId) {
+        return res.status(400).send({'error': 'Only the owner can transfer the image'})
+    }
+
+    // CHECK IF THE NEW GALLERY EXISTS AND USER OWNS THIS GALLERY
+    sql = `SELECT * FROM gallery WHERE id = '${newGalleryId}'`
+    const galleryFound = await dbquery(sql)
+
+
+    if(galleryFound.length === 0) {
+        return res.status(400).send({'error': 'gallery in which you are trying to move this image, does not exist'})
+    }
+    else if(galleryFound[0].created_by !== userId) {
+        return res.status(400).send({'error': 'you can only move to a gallery owned by you'})
+    }
+
+    // UPDATING THE GALLERY OF THE IMG 
+
+    sql = `UPDATE images set gallery=${newGalleryId} WHERE id = ${imageId}`
+    let dbRes = await dbquery(sql)
+
+    res.status(200).send({
+        "message":"image moved successfully",
+        "galleryId":newGalleryId
+    })
+})
 
 
 

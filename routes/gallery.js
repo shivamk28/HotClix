@@ -39,6 +39,36 @@ router.post('/', verify, async(req, res) => {
 })
 
 
+//RENAME A GALLERY
+router.put('/:galleryId', verify, async(req, res) => {
+    const { galleryId } = req.params
+    const {newName} = req.body
+    const userId = req.userId
+
+    let sql = `SELECT * FROM gallery WHERE id = '${galleryId}'`
+    const galleryFound = await dbquery(sql)
+
+    // CHECK IF THE GALLERY EXISTS & USER OWNS THIS GALLERY 
+
+    if(galleryFound.length === 0) {
+        return res.status(400).send({'error': 'No gallery found'})
+    }
+    else if(galleryFound[0].created_by !== userId) {
+        return res.status(400).send({'error': 'Only the owner can rename the gallery'})
+    }
+    //CHEKING THE LENGTH OF NEW NAME
+    if(newName.length>255)
+        return res.status(400).send({'error':'name too long (max:255 chars)'})
+
+    // RENAME INTO DB
+    sql = `UPDATE gallery SET name='${newName}' WHERE id = ${galleryId}`
+    const dbRes = await dbquery(sql)
+    return res.status(200).send({
+        'message': 'gallery name updated', 
+        newName 
+    })
+})
+
 // LIST ALL GALLERIES FOR A USER 
 
 router.get('/', async (req, res) => {

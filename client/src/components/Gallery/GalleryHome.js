@@ -4,10 +4,11 @@ import ImageGallery from '../ImageGallery/Gallery'
 import { UserAvatarSmall } from '../UserProfile/Profile'
 import {
     getGalleryDetails, getImages,
-    isUserOwner, deleteGallery, requestGalleryDownload
+    isUserOwner, deleteGallery, requestGalleryDownload, renameGallery
 } from '../../helpers/request'
 import { titleCase } from '../../helpers'
 import './galleryHome.css'
+import EdiText from 'react-editext'
 
 function UserGallery() {
 
@@ -17,6 +18,8 @@ function UserGallery() {
     // STATES
     const [galleryData, setGalleryData] = useState({ gallery: {}, loading: true })
     const [galleryImages, setGalleryImages] = useState({ images: [], loading: true })
+    const [galleryName,setGalleryName] = useState();
+    const [renameErrorMsg,setRenameErrorMsg] = useState('')
 
     useEffect(() => {
 
@@ -29,6 +32,7 @@ function UserGallery() {
                     gallery: gallery,
                     loading: false
                 })
+                setGalleryName(titleCase(gallery.name))
             })
             .catch(console.log)
 
@@ -64,6 +68,32 @@ function UserGallery() {
         }
     }
 
+
+    const handleRename = (newName)=>{
+        if(newName.length>255)
+        {
+            setRenameErrorMsg("max 255 chars allowed");
+            return false;
+        }
+        setRenameErrorMsg("updating...")
+        return renameGallery(galleryData.gallery.id,newName)
+        .then(res=>{
+            if(res.status===200)
+            {
+                setRenameErrorMsg("updated successfully")
+                setGalleryName(newName)
+                return true;
+            }
+            setRenameErrorMsg(res.error)
+            return false
+            
+        })
+        .catch((error)=>{
+            console.log(error)
+            return false
+          });
+    }
+
     // TODO 
     // enable download 
         
@@ -85,7 +115,29 @@ function UserGallery() {
                             {
                                 galleryData.loading
                                     ? 'loading...'
-                                    : titleCase(galleryData.gallery.name)
+                                    :
+                                    (
+                                        // if user is owner show editable component
+                                        isUserOwner(galleryData.gallery.created_by)
+                                        ? 
+                                        <EdiText 
+                                        type="text" 
+                                        value={galleryName} 
+                                        onSave={setGalleryName} 
+                                        hint="max 255 chars allowed" 
+                                        showButtonsOnHover="true" 
+                                        submitOnEnter="true" 
+                                        cancelOnEscape="true" 
+                                        cancelOnUnfocus="true" 
+                                        canEdit={isUserOwner(galleryData.gallery.created_by)} 
+                                        validation={handleRename} 
+                                        validationMessage={renameErrorMsg}
+                                        />
+                                        :
+                                        //else noraml name
+                                        <p>{galleryName}</p>
+                                    )
+
                             }
                         </div>
                         <div className="gallery-user">
